@@ -1,0 +1,38 @@
+name: iOS Development Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install NVM and Use Node.js 20
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          source ~/.nvm/nvm.sh
+          nvm install 20
+          nvm use 20
+          node -v
+        shell: bash
+
+      - name: Set up Expo credentials
+        run: echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" > .env
+        shell: bash
+
+      - name: Install dependencies
+        run: yarn install --ignore-engines
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Build iOS app
+        run: eas build --platform ios --profile development --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

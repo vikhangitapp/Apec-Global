@@ -1,0 +1,23 @@
+workflows:
+  react-native:
+    name: React Native Build
+    environment:
+      vars:
+        EXPO_TOKEN: H383HR7SLD_6Ees26j2emgpAzsz92LuI9MPAXznF
+      node: latest
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Run tests
+        script: npm test
+    artifacts:
+      - build
+    publishing:
+      scripts:
+        - name: Build Android APK
+          script: cd android && ./gradlew assembleRelease
+        - name: Build iOS IPA
+          script: |
+            cd ios
+            xcodebuild -workspace sampleapp.xcworkspace -scheme sampleapp -configuration Release -archivePath ./build/sampleapp.xcarchive archive
+            xcodebuild -exportArchive -archivePath ./build/YourApp.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ./build/sampleapp
